@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gatekeeperlib"
+version = "0.1.1"
+description = "A readable standalone Python driver for the sp2 Quantum GateKeeper"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{ name = "sp2 Quantum" }]
+dependencies = [
+    "h5py>=3.10",
+    "numpy>=1.26",
+    "pyserial>=3.5",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Science/Research",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Scientific/Engineering",
+]
+
+[project.optional-dependencies]
+live-test = ["matplotlib>=3.8"]
+test = [
+    "pytest>=8",
+    "ruff>=0.12",
+    "ty>=0.0.1a16",
+]
+
+[project.urls]
+Documentation = "https://sp2quantum.com"
+Firmware = "https://github.com/sp2quantum/gatekeeper-firmware"
+
+[project.scripts]
+gatekeeper-hardware-test = "gatekeeper.hardware_test:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+gatekeeper = ["py.typed"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
