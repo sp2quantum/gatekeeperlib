@@ -6,7 +6,7 @@ acquired data back to the caller.
 
 ## Install
 
-gatekeeperlib equires Python 3.10 or newer. We highly recommend using `uv` as your package manager. To add it to a `uv` project:
+gatekeeperlib requires Python 3.10 or newer. We highly recommend using `uv` as your package manager. To add it to a `uv` project:
 
 ```bash
 uv add gatekeeperlib
@@ -289,3 +289,24 @@ uv run ruff check .
 uv run ty check src
 uv build
 ```
+
+## Publishing
+
+The upload scripts load `test_pypi_key` or `pypi_key` from the ignored `.env`
+file, build fresh distributions, validate them with Twine, and upload them:
+
+```bash
+uv run python upload_to_test_pypi.py
+uv run python upload_to_pypi.py
+```
+
+To build and validate without uploading:
+
+```bash
+uv run python upload_to_test_pypi.py --check-only
+uv run python upload_to_pypi.py --check-only
+```
+
+The same scripts work with ordinary Python on Windows, macOS, and Linux. If
+`uv` is unavailable, install the publishing tools with
+`python -m pip install build twine` first.
