@@ -73,7 +73,7 @@ print(gk.is_serial_host, gk.serial_host_pid)
 
 ## Full Command List
 
-Find the full command list at [https://sp2quantum.com/docs/command_list](https://sp2quantum.com/docs/command_list)
+[**Find the full command list here**](https://sp2quantum.com/docs/command_list?source=library)
 
 ## Basic Examples
 
