@@ -147,7 +147,7 @@ def test_queries_on_one_instance_are_serialized_between_threads(
         time.sleep(0.0005)
         return original_read(count)
 
-    instrument.read = slow_read  # type: ignore[method-assign]
+    instrument.read = slow_read  # ty: ignore[invalid-assignment]
     with ThreadPoolExecutor(max_workers=2) as pool:
         results = list(pool.map(device.query, ["NOP", "*RDY?"] * 10))
 
@@ -204,6 +204,69 @@ def test_adc_status_commands_and_filter_words_follow_chopping(
         "IDLE_MODE,0",
         "RESET",
     ]
+
+
+def test_firmware_version_and_adc_calibration_getters(
+    connection: tuple[GateKeeper, FakeSerial],
+) -> None:
+    device, instrument = connection
+    instrument.responses.update(
+        {
+            "GET_FIRMWARE_VERSION": "Commit Hash: abc123",
+            "GET_ZERO_SCALE_CAL,2": "8388608",
+            "GET_FULL_SCALE_CAL,2": "2097152",
+            "GET_SAVED_ZERO_SCALE_CAL,2": "8388609",
+            "GET_SAVED_FULL_SCALE_CAL,2": "2097153",
+        }
+    )
+
+    assert device.firmware_version() == "Commit Hash: abc123"
+    assert device.get_adc_zero_scale_calibration(2) == 8_388_608
+    assert device.get_adc_full_scale_calibration(2) == 2_097_152
+    assert device.get_saved_adc_zero_scale_calibration(2) == 8_388_609
+    assert device.get_saved_adc_full_scale_calibration(2) == 2_097_153
+
+
+def test_adc_calibration_setters_and_reset(
+    connection: tuple[GateKeeper, FakeSerial],
+) -> None:
+    device, instrument = connection
+    instrument.responses.update(
+        {
+            "SET_SAVED_ZERO_SCALE_CAL,2,8388608": "Saved zero scale calibration",
+            "SET_SAVED_FULL_SCALE_CAL,2,2097152": "Saved full scale calibration",
+            "SET_ZERO_SCALE_CAL,2,8388608": "Saved zero scale calibration",
+            "SET_FULL_SCALE_CAL,2,2097152": "Saved full scale calibration",
+            "HARD_RESET_CALIBRATION": "Calibration data reset to defaults",
+        }
+    )
+
+    assert device.set_saved_adc_zero_scale_calibration(2, 8_388_608) == (
+        "Saved zero scale calibration"
+    )
+    assert device.set_saved_adc_full_scale_calibration(2, 2_097_152) == (
+        "Saved full scale calibration"
+    )
+    assert device.set_adc_zero_scale_calibration(2, 8_388_608) == (
+        "Saved zero scale calibration"
+    )
+    assert device.set_adc_full_scale_calibration(2, 2_097_152) == (
+        "Saved full scale calibration"
+    )
+    assert device.hard_reset_calibration() == "Calibration data reset to defaults"
+
+
+def test_adc_calibration_methods_validate_channels_and_register_values(
+    connection: tuple[GateKeeper, FakeSerial],
+) -> None:
+    device, _ = connection
+
+    with pytest.raises(ValueError, match="channels 0 through 7"):
+        device.get_adc_zero_scale_calibration(8)
+    with pytest.raises(ValueError, match="between 0 and 16777215"):
+        device.set_adc_zero_scale_calibration(0, -1)
+    with pytest.raises(ValueError, match="between 0 and 16777215"):
+        device.set_saved_adc_full_scale_calibration(0, 0x1000000)
 
 
 def test_dac_led_ramp_uses_working_server_argument_order(

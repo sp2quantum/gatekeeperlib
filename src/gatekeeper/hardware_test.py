@@ -15,6 +15,20 @@ import numpy as np
 
 from .device import GateKeeper
 
+_BLOCKED_CALIBRATION_COMMANDS = frozenset(
+    {
+        "GET_ZERO_SCALE_CAL",
+        "GET_FULL_SCALE_CAL",
+        "GET_SAVED_ZERO_SCALE_CAL",
+        "GET_SAVED_FULL_SCALE_CAL",
+        "SET_SAVED_ZERO_SCALE_CAL",
+        "SET_SAVED_FULL_SCALE_CAL",
+        "SET_ZERO_SCALE_CAL",
+        "SET_FULL_SCALE_CAL",
+        "HARD_RESET_CALIBRATION",
+    }
+)
+
 
 def _argument(value: Any) -> str:
     if isinstance(value, bool):
@@ -67,6 +81,11 @@ class LibraryHarness:
         return bytes(data)
 
     def write_command(self, name: str, *arguments: Any) -> str:
+        command_name = name.split(",", 1)[0].strip().upper()
+        if command_name in _BLOCKED_CALIBRATION_COMMANDS:
+            raise RuntimeError(
+                f"Live hardware tests refuse calibration command {command_name}"
+            )
         command = _command(name, *arguments)
         self.device.write(command)
         return command

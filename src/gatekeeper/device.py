@@ -21,6 +21,7 @@ _VOLTAGE_MAX = 10.0
 _CONVERSION_TIME_MIN = 82e-6
 _CONVERSION_TIME_MAX = 2686e-6
 _DAC_CODE_MAX = 1_048_575
+_ADC_CALIBRATION_MAX = 0xFFFFFF
 _TIMEOUT_MARGIN = 5.0
 
 
@@ -72,6 +73,13 @@ def _positive_time(value: float, *, name: str) -> float:
     result = float(value)
     if not math.isfinite(result) or result <= 0:
         raise ValueError(f"{name} must be a positive number of seconds")
+    return result
+
+
+def _adc_calibration_value(value: int, *, name: str = "value") -> int:
+    result = int(value)
+    if result not in range(_ADC_CALIBRATION_MAX + 1):
+        raise ValueError(f"{name} must be between 0 and {_ADC_CALIBRATION_MAX}")
     return result
 
 
@@ -436,6 +444,9 @@ class GateKeeper:
     def serial_number(self) -> str:
         return self.query("SERIAL_NUMBER")
 
+    def firmware_version(self) -> str:
+        return self.query("GET_FIRMWARE_VERSION")
+
     # DAC control
 
     def set_voltage(self, channel: int, voltage: float) -> float:
@@ -615,6 +626,45 @@ class GateKeeper:
             return self.query("CALIBRATE_ALL_ADC_CHANNELS_FULL_SCALE")
         channel = _channels(channel, name="channel")[0]
         return self.query(self._command("CALIBRATE_ADC_CHANNEL_FULL_SCALE", channel))
+
+    def get_adc_zero_scale_calibration(self, channel: int) -> int:
+        channel = _channels(channel, name="channel")[0]
+        return int(self.query(self._command("GET_ZERO_SCALE_CAL", channel)))
+
+    def get_adc_full_scale_calibration(self, channel: int) -> int:
+        channel = _channels(channel, name="channel")[0]
+        return int(self.query(self._command("GET_FULL_SCALE_CAL", channel)))
+
+    def get_saved_adc_zero_scale_calibration(self, channel: int) -> int:
+        channel = _channels(channel, name="channel")[0]
+        return int(self.query(self._command("GET_SAVED_ZERO_SCALE_CAL", channel)))
+
+    def get_saved_adc_full_scale_calibration(self, channel: int) -> int:
+        channel = _channels(channel, name="channel")[0]
+        return int(self.query(self._command("GET_SAVED_FULL_SCALE_CAL", channel)))
+
+    def set_saved_adc_zero_scale_calibration(self, channel: int, value: int) -> str:
+        channel = _channels(channel, name="channel")[0]
+        value = _adc_calibration_value(value)
+        return self.query(self._command("SET_SAVED_ZERO_SCALE_CAL", channel, value))
+
+    def set_saved_adc_full_scale_calibration(self, channel: int, value: int) -> str:
+        channel = _channels(channel, name="channel")[0]
+        value = _adc_calibration_value(value)
+        return self.query(self._command("SET_SAVED_FULL_SCALE_CAL", channel, value))
+
+    def set_adc_zero_scale_calibration(self, channel: int, value: int) -> str:
+        channel = _channels(channel, name="channel")[0]
+        value = _adc_calibration_value(value)
+        return self.query(self._command("SET_ZERO_SCALE_CAL", channel, value))
+
+    def set_adc_full_scale_calibration(self, channel: int, value: int) -> str:
+        channel = _channels(channel, name="channel")[0]
+        value = _adc_calibration_value(value)
+        return self.query(self._command("SET_FULL_SCALE_CAL", channel, value))
+
+    def hard_reset_calibration(self) -> str:
+        return self.query("HARD_RESET_CALIBRATION")
 
     # Buffered acquisition
 

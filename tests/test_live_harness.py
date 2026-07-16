@@ -54,6 +54,20 @@ def test_library_harness_sends_commands_through_gatekeeper(
     assert device.baud_rate == 115_200
 
 
+@pytest.mark.parametrize("command", sorted(live_test._BLOCKED_CALIBRATION_COMMANDS))
+def test_library_harness_refuses_new_calibration_commands(
+    harness: live_test.LibraryHarness,
+    command: str,
+) -> None:
+    device = harness.device
+    assert isinstance(device, FakeGateKeeper)
+
+    with pytest.raises(RuntimeError, match=f"refuse calibration command {command}"):
+        harness.write_command(command, 0, 1)
+
+    assert device.writes == []
+
+
 def test_library_harness_reads_binary_data(
     harness: live_test.LibraryHarness,
 ) -> None:

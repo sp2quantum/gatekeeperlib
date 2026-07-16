@@ -274,13 +274,13 @@ and channels are integers from 0 through 7.
 
 | Area | Methods |
 | --- | --- |
-| Connection | `find_ports`, `idn`, `ready`, `nop`, `serial_number`, `close` |
+| Connection | `find_ports`, `idn`, `ready`, `nop`, `serial_number`, `firmware_version`, `close` |
 | Direct DAC | `set_voltage`, `get_dac`, `set_dac_code`, `initialize` |
 | DAC limits | `set_full_scale`, `get_full_scale`, `set_upper_limit`, `set_lower_limit`, `get_upper_limit`, `get_lower_limit` |
 | DAC calibration | `calibrate_dacs`, `set_offset_and_gain`, `get_offset_and_gain` |
 | Direct ADC | `read_voltage`, `read_voltages`, `idle_adc`, `active_adc_channels`, `reset_adcs`, `hard_reset_adcs` |
 | ADC timing | `set_chopping`, `get_chopping`, `set_conversion_time`, `set_conversion_filter`, `get_conversion_time` |
-| ADC calibration | `calibrate_adc_zero`, `calibrate_adc_full_scale` |
+| ADC calibration | `calibrate_adc_zero`, `calibrate_adc_full_scale`, `get_adc_zero_scale_calibration`, `get_adc_full_scale_calibration`, `get_saved_adc_zero_scale_calibration`, `get_saved_adc_full_scale_calibration`, `set_adc_zero_scale_calibration`, `set_adc_full_scale_calibration`, `set_saved_adc_zero_scale_calibration`, `set_saved_adc_full_scale_calibration`, `hard_reset_calibration` |
 | Ramps | `ramp`, `dac_led_buffer_ramp`, `time_series_buffer_ramp`, `dac_led_buffer_ramp_2d`, `time_series_buffer_ramp_2d`, `boxcar_buffer_ramp` |
 | ADC capture | `adc_read`, `time_series_adc_read` |
 | Waveforms | `awg_write`, `awg_stream`, `stop` |
