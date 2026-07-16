@@ -139,11 +139,22 @@ class GateKeeper:
 
     def __init__(
         self,
-        port: str | int,
+        port: str | int | None = None,
         *,
         baud_rate: int = 115_200,
         timeout: float = 5.0,
     ) -> None:
+        if port is None:
+            available_ports = self.find_ports()
+            if not available_ports:
+                raise GateKeeperError("no GateKeeper ports were found")
+            if len(available_ports) > 1:
+                ports = ", ".join(available_ports)
+                raise GateKeeperError(
+                    f"multiple GateKeeper ports were found ({ports}); specify a port"
+                )
+            port = available_ports[0]
+            print(f"Auto-selected GateKeeper on {port}.")
         self.port = _port_name(port)
         self._default_timeout = _positive_time(timeout, name="timeout")
         self._thread_lock = threading.RLock()

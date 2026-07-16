@@ -74,6 +74,44 @@ def float_bytes(values: list[float]) -> bytes:
     return np.asarray(values, dtype="<f4").tobytes()
 
 
+def test_constructor_auto_selects_only_gatekeeper_port(
+    monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    instrument = FakeSerial()
+    monkeypatch.setattr(GateKeeper, "find_ports", staticmethod(lambda: ("COM7",)))
+    monkeypatch.setattr(
+        "gatekeeper.device.open_shared_serial",
+        lambda port, baud_rate, timeout: instrument,
+    )
+
+    device = GateKeeper()
+
+    assert device.port == "COM7"
+    assert capsys.readouterr().out == "Auto-selected GateKeeper on COM7.\n"
+
+
+def test_constructor_without_port_errors_when_none_are_found(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(GateKeeper, "find_ports", staticmethod(tuple))
+
+    with pytest.raises(GateKeeperError, match="no GateKeeper ports were found"):
+        GateKeeper()
+
+
+def test_constructor_without_port_errors_when_multiple_are_found(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        GateKeeper,
+        "find_ports",
+        staticmethod(lambda: ("COM7", "COM8")),
+    )
+
+    with pytest.raises(GateKeeperError, match=r"multiple GateKeeper ports.*specify a port"):
+        GateKeeper()
+
+
 def test_connection_and_text_commands(
     connection: tuple[GateKeeper, FakeSerial],
 ) -> None:

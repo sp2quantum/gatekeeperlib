@@ -21,6 +21,16 @@ python -m pip install gatekeeperlib
 
 ## Connect
 
+If exactly one GateKeeper is connected, the port can be selected automatically:
+
+```python
+from gatekeeper import GateKeeper
+
+gk = GateKeeper()
+```
+
+If multiple GateKeepers are connected, specify the port:
+
 ```python
 from gatekeeper import GateKeeper
 
