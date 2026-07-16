@@ -37,7 +37,7 @@ test = [
 [project.urls]
 Documentation = "https://sp2quantum.web.app/docs/command_list/?source=library"
 Firmware = "https://github.com/sp2quantum/gatekeeper-firmware"
-gatekeeperlib Source Code = "https://github.com/sp2quantum/gatekeeperlib"
+"gatekeeperlib Source Code" = "https://github.com/sp2quantum/gatekeeperlib"
 
 [project.scripts]
 gatekeeper-hardware-test = "gatekeeper.hardware_test:main"
