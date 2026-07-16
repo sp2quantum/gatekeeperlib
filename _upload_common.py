@@ -80,10 +80,14 @@ def upload(*, repository_url: str, token_key: str, label: str) -> int:
             print(f"Build and Twine checks passed; nothing was uploaded to {label}.")
             return 0
 
-        load_dotenv(root / ".env")
+        env_file = root / ".env"
+        if env_file.is_file():
+            load_dotenv(env_file)
         token = os.environ.get(token_key, "").strip()
         if not token:
-            raise RuntimeError(f"Missing {token_key} in {root / '.env'}")
+            raise RuntimeError(
+                f"Missing {token_key}; set it in the environment or in {env_file}"
+            )
         environment = os.environ.copy()
         environment.update(
             {
