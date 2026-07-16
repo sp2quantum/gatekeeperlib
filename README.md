@@ -71,7 +71,11 @@ resynchronizes the physical port before the next command.
 print(gk.is_serial_host, gk.serial_host_pid)
 ```
 
-## Examples
+## Full Command List
+
+Find the full command list at [https://sp2quantum.com/docs/command_list](https://sp2quantum.com/docs/command_list)
+
+## Basic Examples
 
 ### Output shapes
 
